@@ -16,7 +16,6 @@
 			membershipExceptions = (
 				"/Localized: LaunchScreen.storyboard",
 				Info.plist,
-				Resources/Assets.xcassets,
 			);
 			target = 11EEE27D2DD32E6300E431EB /* The Weather */;
 		};
