@@ -36,11 +36,13 @@ extension UIImageView {
             guard let image = UIImage(data: data) else { return }
             
             Self.imageCache.setObject(image, forKey: urlString as NSString)
+            Self.activeTasks[urlString as NSString] = nil
             
             DispatchQueue.main.async {
                 self?.image = image
             }
         }
+        Self.activeTasks[urlString as NSString] = task
         task.resume()
     }
 }
