@@ -17,7 +17,7 @@ struct Weather {
         self.city = dto.location.name
         self.tempC = dto.current.tempC
         self.condition = dto.current.condition.text
-        self.weatherImage = "https:\(dto.current.condition.icon)"
+        self.weatherImage = "https:\(dto.current.condition.icon)" 
     }
 }
     

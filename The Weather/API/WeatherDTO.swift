@@ -23,18 +23,12 @@ struct Location: Decodable {
 }
 
 struct Current: Decodable {
-//    let lastUpdatedEpoch: Int
-//    let lastUpdated: String
     let tempC: Double
     let condition: Condition
-//    let windKph: Double
     
     enum CodingKeys: String, CodingKey {
-//        case lastUpdatedEpoch = "last_updated_epoch"
-//        case lastUpdated = "last_updated"
         case tempC = "temp_c"
         case condition
-//        case windKph = "wind_kph"
     }
 }
 
@@ -48,44 +42,36 @@ struct Forecast: Decodable {
 }
 
 struct Forecastday: Decodable {
-    let date: String
-    let dateEpoch: Int
+    let date: Int
     let day: Day
-    let hour: Hour
-    let condition: Condition
+    let hour: [Hour]
     
     enum CodingKeys: String, CodingKey {
-        case date
-        case dateEpoch = "date_epoch"
+        case date = "date_epoch"
         case day
         case hour
-        case condition
     }
 }
 
 struct Day: Decodable {
     let maxTemp: Double
     let minTemp: Double
-    let avgTemp: Double
     let condition: Condition
     
     enum CodingKeys: String, CodingKey {
         case maxTemp = "maxtemp_c"
         case minTemp = "mintemp_c"
-        case avgTemp = "avgtemp_c"
         case condition
     }
 }
 
 struct Hour: Decodable {
-    let timeEpoch: Int
-    let time: String
+    let time: Int
     let temp: Double
     let condition: Condition
     
     enum CodingKeys: String, CodingKey {
-        case timeEpoch = "time_epoch"
-        case time
+        case time = "time_epoch"
         case temp = "temp_c"
         case condition
     }
