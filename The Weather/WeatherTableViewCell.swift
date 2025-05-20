@@ -43,6 +43,18 @@ final class WeatherTableViewCell: UITableViewCell {
         return label
     }()
     
+    private let temperatureProgressBar: UIProgressView = {
+        let progressBar = UIProgressView()
+        progressBar.clipsToBounds = true
+        progressBar.layer.cornerRadius = 5
+        progressBar.trackTintColor = .systemGray
+        
+        progressBar.translatesAutoresizingMaskIntoConstraints = false
+        return progressBar
+    }()
+    
+    private var isGradientRendered = false
+    
     //    MARK: - init
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -55,26 +67,42 @@ final class WeatherTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        if !isGradientRendered && temperatureProgressBar.bounds.width > 0 {
+            let progressView = GradientView(frame: temperatureProgressBar.bounds)
+            temperatureProgressBar.progressImage = progressView.drawUIImage()
+            isGradientRendered = true
+        }
+    }
+    
     //    MARK: - Methods
+
+    func configure(timestamp: Int, imageURL: String, minTemp: Double, maxTemp: Double) {
+        self.day.text = Date.weekday(from: timestamp)
+        self.iconImageView.loadImage(from: imageURL)
+        self.maxTemp.text = "\(maxTemp)°"
+        self.minTemp.text = "\(minTemp)°"
+        
+        let maxProgressTemp: Float = 100 / 57
+        let progress = (maxProgressTemp * Float(maxTemp)) / 100
+        temperatureProgressBar.setProgress(progress, animated: true)
+    }
     
     private func setUI() {
         [
             day,
             iconImageView,
             maxTemp,
-            minTemp
+            minTemp,
+            temperatureProgressBar
         ].forEach {contentView.addSubview($0)}
-    }
-    
-    func configure(timestamp: Int, imageURL: String, minTemp: Double, maxTemp: Double) {
-        self.day.text = Date.weekday(from: timestamp)
-        self.iconImageView.loadImage(from: imageURL)
-        self.maxTemp.text = "\(maxTemp)°"
-        self.minTemp.text = "\(minTemp)°"
     }
     
     override func prepareForReuse() {
         iconImageView.image = nil
+        temperatureProgressBar.progressImage = nil
     }
 }
 
@@ -95,7 +123,12 @@ private extension WeatherTableViewCell {
             minTemp.leadingAnchor.constraint(equalTo: iconImageView.trailingAnchor, constant: 25),
             minTemp.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             
-            maxTemp.leadingAnchor.constraint(equalTo: minTemp.trailingAnchor, constant: 15),
+            temperatureProgressBar.leadingAnchor.constraint(equalTo: minTemp.trailingAnchor, constant: 5),
+            temperatureProgressBar.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            temperatureProgressBar.widthAnchor.constraint(equalToConstant: 120),
+            temperatureProgressBar.heightAnchor.constraint(equalToConstant: 10),
+            
+            maxTemp.leadingAnchor.constraint(equalTo: temperatureProgressBar.trailingAnchor, constant: 15),
             maxTemp.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ])
     }
