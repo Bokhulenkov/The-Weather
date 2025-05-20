@@ -9,7 +9,7 @@ import Foundation
 
 public enum WeatherEndpoint {
     case current (location: String)
-    case days (Int, location: String)
+    case days (Int, lat: Double, lon: Double)
     
     func path() -> String {
         switch self {
@@ -27,10 +27,10 @@ public enum WeatherEndpoint {
                 URLQueryItem(name: "key", value: key),
                 URLQueryItem(name: "q", value: location)
             ]
-        case .days(let days, let location):
+        case .days(let days, let lat, let lon):
             return [
                 URLQueryItem(name: "key", value: key),
-                URLQueryItem(name: "q", value: location),
+                URLQueryItem(name: "q", value: "\(lat),\(lon)"),
                 URLQueryItem(name: "days", value: "\(days)")
             ]
         }
@@ -50,7 +50,3 @@ public enum WeatherEndpoint {
         return url
     }
 }
-
-// api.weatherapi.com/v1/forecast.json?key=fa8b3df74d4042b9aa7135114252304&q=LAT,LON&days=7
-// api.weatherapi.com/v1/current.json?key=fa8b3df74d4042b9aa7135114252304&q=LAT,LON
-
