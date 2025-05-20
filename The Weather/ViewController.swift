@@ -13,10 +13,11 @@ final class ViewController: UIViewController {
     //    MARK: - Properties
     
     private let network = NetworkService()
-    private var weather: Weather?
-    private var detailWeather: [DetailWeather] = []
+    private let locationManager = CLLocationManager()
     private let weatherView = WeatherView()
     private let countDay = 3
+    private var weather: Weather?
+    private var detailWeather: [DetailWeather] = []
     
     //    MARK: - LifeCicle
     
@@ -26,30 +27,46 @@ final class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        setDelegate()
+        //        fetchWeather()
+        setLocation()
+    }
+    
+    //    MARK: - Methods
+    
+    private func setDelegate() {
         weatherView.setDelegate(self)
-        
-        //        network.fetchData(type: WeatherDTO.self, endPoint: .current(location: "LAT")) { result in
-        //            switch result {
-        //            case .success(let dto):
-        //                print(dto.location)
-        //                print(dto.current)
-        //                self.weather = Weather(from: dto)
-        //
-        //                DispatchQueue.main.async {
-        //                    self.weatherView.showWeather(from: self.weather)
-        //                }
-        //
-        //            case .failure(let error):
-        //                print(error.localizedDescription)
-        //                print(error.description)
-        //            }
-        //        }
-        
-        network.fetchData(type: WeatherDTO.self, endPoint: .days(countDay, location: "LAT")) { result in
+        locationManager.delegate = self
+    }
+    
+    private func setLocation() {
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.requestLocation()
+    }
+    
+    private func fetchWeatherLocation(lat: Double, lon: Double) {
+        network.fetchData(type: WeatherDTO.self, endPoint: .days(countDay, lat: lat, lon: lon)) { result in
             switch result {
             case .success(let dto):
                 self.detailWeather = dto.toDetailWeather()
+                self.weather = Weather(from: dto)
+                
+                DispatchQueue.main.async {
+                    self.weatherView.showWeather(from: self.weather)
+                }
+                
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
+    }
+    
+    private func fetchWeather() {
+        network.fetchData(type: WeatherDTO.self, endPoint: .current(location: "Moscow")) { result in
+            switch result {
+            case .success(let dto):
+                print(dto.location)
+                print(dto.current)
                 self.weather = Weather(from: dto)
                 
                 DispatchQueue.main.async {
@@ -63,7 +80,6 @@ final class ViewController: UIViewController {
         }
     }
 }
-
 
 //    MARK: - Extensions UITableViewDelegate, UITableViewDataSource
 
@@ -134,5 +150,56 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         ])
         
         return headerView
+    }
+}
+
+//    MARK: - Extension CLLocationManagerDelegate
+
+extension ViewController: CLLocationManagerDelegate {
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        switch manager.authorizationStatus {
+        case .notDetermined:
+            print("When user did not yet determined")
+        case .restricted:
+            print("Restricted by parental control")
+        case .denied:
+            print("When user select option Dont't Allow")
+        case .authorizedWhenInUse:
+            print("When user select option Allow While Using App or Allow Once")
+        case .authorizedAlways:
+            print("When user select option Allow Always")
+        default:
+            print("default")
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let location = locations.last else {
+            print("Error getting location")
+            return
+        }
+        let lat = location.coordinate.latitude
+        let lon = location.coordinate.longitude
+        fetchWeatherLocation(lat: lat, lon: lon)
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
+        locationManager.stopUpdatingLocation()
+        if let error = error as? CLError {
+            switch error.code {
+            case .locationUnknown, .denied, .network:
+                print("Location request failed with error: \(error.localizedDescription)")
+            case .headingFailure:
+                print("Heading request failed with error: \(error.localizedDescription)")
+            case .rangingUnavailable, .rangingFailure:
+                print("Ranging request failed with error: \(error.localizedDescription)")
+            case .regionMonitoringDenied, .regionMonitoringFailure, .regionMonitoringSetupDelayed, .regionMonitoringResponseDelayed:
+                print("Region monitoring request failed with error: \(error.localizedDescription)")
+            default:
+                print("Unknown location manager error: \(error.localizedDescription)")
+            }
+        } else {
+            print("Unknown error occurred while handling location manager error: \(error.localizedDescription)")
+        }
     }
 }
