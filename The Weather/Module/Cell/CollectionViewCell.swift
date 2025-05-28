@@ -14,14 +14,17 @@ final class CollectionViewCell: UICollectionViewCell {
     private let vStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.distribution = .equalCentering
+        stack.layer.borderColor = UIColor.red.cgColor
+        stack.layer.borderWidth = 2
+        stack.distribution = .fillEqually
+        stack.alignment = .center
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }()
     
     private let hour: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 14)
+        label.font = .systemFont(ofSize: 14, weight: .bold)
         label.textColor = .customGrey
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -30,7 +33,7 @@ final class CollectionViewCell: UICollectionViewCell {
     private let iconImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.tintColor = .customGrey
-        imageView.contentMode = .scaleAspectFill
+        imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -57,10 +60,16 @@ final class CollectionViewCell: UICollectionViewCell {
     
     //    MARK: - Methods
     
-    func configure() {
-        hour.text = "18"
-        iconImageView.image = UIImage(resource: .placeholder)
-        temperature.text = "24°"
+    func configure(timestamp: Int, imageURL: String, temperature: Double) {
+        let nowTimestamp = Date.currentHourTimestamp
+        if timestamp == nowTimestamp {
+            hour.text = "Now"
+        } else {
+            hour.text = Date.formattedTime(from: timestamp)
+        }
+        
+        iconImageView.loadImage(from: imageURL)
+        self.temperature.text = "\(temperature)°"
     }
     
     private func setUI() {
@@ -79,15 +88,11 @@ private extension CollectionViewCell {
     func setConstraints() {
         NSLayoutConstraint.activate([
             vStack.topAnchor.constraint(equalTo: contentView.topAnchor),
-            vStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            vStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             vStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            
-            hour.topAnchor.constraint(equalTo: vStack.topAnchor, constant: 5),
-            hour.centerXAnchor.constraint(equalTo: vStack.centerXAnchor),
+            vStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            vStack.widthAnchor.constraint(greaterThanOrEqualToConstant: 40),
             
             iconImageView.widthAnchor.constraint(equalToConstant: 24),
-            iconImageView.heightAnchor.constraint(equalToConstant: 24)
         ])
     }
 }
