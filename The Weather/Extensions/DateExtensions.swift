@@ -25,4 +25,14 @@ extension Date {
         let hour = formatter.string(from: date)
         return hour
     }
+    
+    static var currentHourTimestamp: Int {
+        let calendar = Calendar.current
+        let now = Date()
+        let components = calendar.dateComponents([.year, .month, .day, .hour], from: now)
+        guard let hourStartDate = calendar.date(from: components) else {
+            fatalError("Error create hourStartDate")
+        }
+        return Int(hourStartDate.timeIntervalSince1970)
+    }
 }
