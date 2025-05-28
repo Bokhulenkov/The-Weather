@@ -101,6 +101,7 @@ final class WeatherTableViewCell: UITableViewCell {
     }
     
     override func prepareForReuse() {
+        super.prepareForReuse()
         iconImageView.image = nil
         temperatureProgressBar.progressImage = nil
     }

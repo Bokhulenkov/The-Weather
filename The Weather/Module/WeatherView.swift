@@ -51,16 +51,12 @@ final class WeatherView: UIView {
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.minimumInteritemSpacing = 10
         
         let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        
+        collection.isPagingEnabled = true
         collection.layer.cornerRadius = 20
-        collection.layer.shadowColor = UIColor.black.cgColor
-        collection.layer.shadowOffset = CGSize(width: 1, height: 1)
-        collection.layer.shadowOpacity = 0.5
-        collection.clipsToBounds = false
         collection.backgroundColor = .customBlue
+        collection.showsHorizontalScrollIndicator = false
         
         collection.translatesAutoresizingMaskIntoConstraints = false
         return collection
@@ -81,7 +77,6 @@ final class WeatherView: UIView {
     }()
     
     private var tableViewHeightConstraint: NSLayoutConstraint!
-    private var collectionViewHeightConstraint: NSLayoutConstraint!
     
     //    MARK: - init
     
@@ -104,9 +99,11 @@ final class WeatherView: UIView {
         conditionLabel.text = weather?.condition
         
         tableView.reloadData()
-        updateTableViewHeight()
         collectionView.reloadData()
-        updateCollectionViewHeight()
+        
+        DispatchQueue.main.async {
+            self.updateTableViewHeight()
+        }
     }
     
     func setDelegate(_ vc: ViewController) {
@@ -124,7 +121,9 @@ final class WeatherView: UIView {
             cityLabel,
             tempLabel,
             iconImageView,
-            conditionLabel,
+            conditionLabel
+        ].forEach { currentView.addSubview($0) }
+        [
             collectionView,
             tableView
         ].forEach { addSubview($0) }
@@ -136,11 +135,6 @@ final class WeatherView: UIView {
     private func updateTableViewHeight() {
         tableViewHeightConstraint.constant = tableView.contentSize.height
         tableView.layoutIfNeeded()
-    }
-    
-    private func updateCollectionViewHeight() {
-        collectionViewHeightConstraint.constant = collectionView.contentSize.height
-        collectionView.layoutIfNeeded()
     }
 }
 
@@ -171,6 +165,7 @@ private extension WeatherView {
             collectionView.topAnchor.constraint(equalTo: currentView.bottomAnchor, constant: 10),
             collectionView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             collectionView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+            collectionView.heightAnchor.constraint(equalToConstant: 100),
             
             tableView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             tableView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
@@ -179,7 +174,5 @@ private extension WeatherView {
         
         tableViewHeightConstraint = tableView.heightAnchor.constraint(equalToConstant: 1)
         tableViewHeightConstraint.isActive = true
-        collectionViewHeightConstraint = collectionView.heightAnchor.constraint(equalToConstant: 1)
-        collectionViewHeightConstraint.isActive = true
     }
 }

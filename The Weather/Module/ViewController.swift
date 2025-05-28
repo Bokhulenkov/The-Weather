@@ -23,6 +23,10 @@ final class ViewController: UIViewController {
         }
     }
     private var hourlyWeather: [HourlyWeather] = []
+    private var filteredHourlyWeather: [HourlyWeather] {
+        let nowTimestamp = Date.currentHourTimestamp
+        return hourlyWeather.filter { $0.time >= nowTimestamp }
+    }
     
     //    MARK: - LifeCicle
     
@@ -210,6 +214,13 @@ extension ViewController: CLLocationManagerDelegate {
 
 extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
+    private var weatherCount: CGFloat {
+         get { 6.0 }
+    }
+    
+    private var spacing: CGFloat {
+        get { 3.0 }
+    }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         hourlyWeather.count
@@ -221,14 +232,29 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
             return UICollectionViewCell()
         }
         
-        
-        cell.configure()
+        let image = filteredHourlyWeather[indexPath.row].weatherImage
+        let temperature = filteredHourlyWeather[indexPath.row].temp
+        let hour = filteredHourlyWeather[indexPath.row].time
+        cell.configure(timestamp: hour, imageURL: image, temperature: temperature)
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: 50, height: 100)
+        let widthCell = (collectionView.frame.width / weatherCount) - spacing/weatherCount
+        return CGSize(width: widthCell, height: 100)
     }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        spacing
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        CGSize(width: 0, height: 150)
+    }
+    
+    
+    
+    
 }
 
 
