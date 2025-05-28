@@ -16,6 +16,7 @@ final class ViewController: UIViewController {
     private let locationManager = CLLocationManager()
     private let weatherView = WeatherView()
     private let countDay = 3
+    private let headerSize: CGFloat = 20
     private var weather: Weather?
     private var detailWeather: [DetailWeather] = [] {
         didSet {
@@ -117,7 +118,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        20
+        headerSize
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -249,12 +250,17 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        CGSize(width: 0, height: 150)
+        CGSize(width: headerSize, height: collectionView.bounds.width)
     }
     
-    
-    
-    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        if kind == UICollectionView.elementKindSectionHeader {
+            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: HeaderView.identifier, for: indexPath) as! HeaderView
+            header.configure(with: "some text")
+            return header
+        }
+        return UICollectionReusableView()
+    }
 }
 
 
