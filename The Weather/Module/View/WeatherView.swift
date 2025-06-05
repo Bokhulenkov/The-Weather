@@ -48,19 +48,7 @@ final class WeatherView: UIView {
         return label
     }()
     
-    private let collectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .horizontal
-        
-        let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collection.isPagingEnabled = true
-        collection.layer.cornerRadius = 20
-        collection.backgroundColor = .customBlue
-        collection.showsHorizontalScrollIndicator = false
-        
-        collection.translatesAutoresizingMaskIntoConstraints = false
-        return collection
-    }()
+    private var collectionView: UICollectionView
     
     private let tableView: UITableView = {
         let tableView = UITableView()
@@ -70,8 +58,7 @@ final class WeatherView: UIView {
         tableView.layer.shadowOpacity = 0.5
         tableView.clipsToBounds = false
         tableView.backgroundColor = .customBlue
-        tableView.isScrollEnabled = false
-        tableView.separatorInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
+        tableView.separatorStyle = .none
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
@@ -81,8 +68,11 @@ final class WeatherView: UIView {
     //    MARK: - init
     
     override init(frame: CGRect) {
+        let layout = WeatherView.makeLayout()
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         super.init(frame: frame)
         setUI()
+        configureCollectionView()
         setConstraints()
     }
     
@@ -136,6 +126,47 @@ final class WeatherView: UIView {
     private func updateTableViewHeight() {
         tableViewHeightConstraint.constant = tableView.contentSize.height
         tableView.layoutIfNeeded()
+    }
+    
+    private static func makeLayout() -> UICollectionViewCompositionalLayout {
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1/6),
+            heightDimension: .fractionalHeight(1.0)
+        )
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        
+        let groupSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .fractionalHeight(0.7)
+        )
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+        
+        let section = NSCollectionLayoutSection(group: group)
+        section.orthogonalScrollingBehavior = .continuous
+        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 0)
+        
+        let headerSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .absolute(30)
+        )
+        
+        let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
+            layoutSize: headerSize,
+            elementKind: UICollectionView.elementKindSectionHeader,
+            alignment: .top
+        )
+        
+        section.boundarySupplementaryItems = [sectionHeader]
+        
+        let layout = UICollectionViewCompositionalLayout(section: section)
+        
+        return layout
+    }
+    
+    private func configureCollectionView() {
+        collectionView.layer.cornerRadius = 20
+        collectionView.backgroundColor = .customBlue
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
     }
 }
 

@@ -14,8 +14,6 @@ final class CollectionViewCell: UICollectionViewCell {
     private let vStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.layer.borderColor = UIColor.red.cgColor
-        stack.layer.borderWidth = 2
         stack.distribution = .fillEqually
         stack.alignment = .center
         stack.translatesAutoresizingMaskIntoConstraints = false
@@ -88,11 +86,11 @@ private extension CollectionViewCell {
     func setConstraints() {
         NSLayoutConstraint.activate([
             vStack.topAnchor.constraint(equalTo: contentView.topAnchor),
-            vStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             vStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            vStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             vStack.widthAnchor.constraint(greaterThanOrEqualToConstant: 40),
             
-            iconImageView.widthAnchor.constraint(equalToConstant: 24),
+            iconImageView.widthAnchor.constraint(equalToConstant: 24)
         ])
     }
 }

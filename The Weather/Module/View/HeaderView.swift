@@ -19,13 +19,26 @@ final class HeaderView: UICollectionReusableView {
         return label
     }()
     
+    private let separator: UIView = {
+        let view = UIView()
+        view.backgroundColor = .separator
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         addSubview(titleLabel)
+        addSubview(separator)
         
         NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 16),
-            titleLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -4)
+            titleLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 10),
+            titleLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -4),
+            
+            separator.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            separator.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 10),
+            separator.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -10),
+            separator.heightAnchor.constraint(equalToConstant: 0.5)
         ])
     }
     

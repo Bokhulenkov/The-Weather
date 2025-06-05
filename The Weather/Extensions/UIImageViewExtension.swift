@@ -32,8 +32,8 @@ extension UIImageView {
                 return
             }
             
-            guard let data = data else { return }
-            guard let image = UIImage(data: data) else { return }
+            guard let data = data else { fatalError("Ошибка получения image url") }
+            guard let image = UIImage(data: data) else { fatalError("Ошибка полученяи image from data") }
             
             Self.imageCache.setObject(image, forKey: urlString as NSString)
             Self.activeTasks[urlString as NSString] = nil

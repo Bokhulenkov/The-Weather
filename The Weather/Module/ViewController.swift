@@ -114,6 +114,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
             minTemp: weather.minTemp,
             maxTemp: weather.maxTemp
         )
+        
         return cell
     }
     
@@ -152,7 +153,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
             imageView.heightAnchor.constraint(equalToConstant: 12),
             
             titleLabel.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 8),
-            titleLabel.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -16)
+            titleLabel.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -16),
         ])
         
         return headerView
@@ -195,6 +196,7 @@ extension ViewController: CLLocationManagerDelegate {
             switch error.code {
             case .locationUnknown, .denied, .network:
                 fetchWeather(city: "Moscow")
+                fetchWeatherLocation(lat: 55.755786, lon: 37.617633)
                 print("Location request failed with error: \(error.localizedDescription)")
             case .headingFailure:
                 print("Heading request failed with error: \(error.localizedDescription)")
@@ -218,11 +220,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
     private var weatherCount: CGFloat {
          get { 6.0 }
     }
-    
-    private var spacing: CGFloat {
-        get { 3.0 }
-    }
-    
+       
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         hourlyWeather.count
     }
@@ -240,23 +238,12 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
         return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let widthCell = (collectionView.frame.width / weatherCount) - spacing/weatherCount
-        return CGSize(width: widthCell, height: 100)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        spacing
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        CGSize(width: headerSize, height: collectionView.bounds.width)
-    }
-    
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == UICollectionView.elementKindSectionHeader {
             let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: HeaderView.identifier, for: indexPath) as! HeaderView
-            header.configure(with: "some text")
+            let condition = weather?.condition ?? "Today good day"
+            let city = weather?.city ?? "City"
+            header.configure(with: "In \(city) - \(condition)")
             return header
         }
         return UICollectionReusableView()
@@ -270,8 +257,6 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
  прогноз погоды на 7 дней - Обработать показ загрузки и ошибку,
  
  если что-то пошло не так, с кнопкой повторного запроса
- 
- По дизайну никаких ограничений нет, можно ориентироваться на погодное приложение Apple
  
 Геолокация и запросы - Запрашивать разрешение на использование геопозиции пользователя в самом начале (при отказе – использовать Москву)
  */
