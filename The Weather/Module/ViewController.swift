@@ -26,7 +26,9 @@ final class ViewController: UIViewController {
     private var hourlyWeather: [HourlyWeather] = []
     private var filteredHourlyWeather: [HourlyWeather] {
         let nowTimestamp = Date.currentHourTimestamp
-        return hourlyWeather.filter { $0.time >= nowTimestamp }
+        let nextDay = Date.endOfNextDay
+        // получаем следующий день 24
+        return hourlyWeather.filter { $0.time >= nowTimestamp && $0.time <= nextDay}
     }
     
     //    MARK: - LifeCicle
@@ -218,11 +220,11 @@ extension ViewController: CLLocationManagerDelegate {
 extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     private var weatherCount: CGFloat {
-         get { 6.0 }
+        get { 6.0 }
     }
-       
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        hourlyWeather.count
+        filteredHourlyWeather.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -250,11 +252,14 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
     }
 }
 
+//    MARK: - Extensions WeatherViewProtocol
+
+extension ViewController: WeatherViewProtocol {
+    func updateLocation() {
+        locationManager.requestLocation()
+    }
+}
 
 /*
-текущая, почасовая (показывать оставшиеся часы из текущего дня и все часы следующего),
- 
- если что-то пошло не так, с кнопкой повторного запроса
- 
-Геолокация и запросы - Запрашивать разрешение на использование геопозиции пользователя в самом начале (при отказе – использовать Москву)
+ текущая, почасовая (показывать оставшиеся часы из текущего дня и все часы следующего),
  */

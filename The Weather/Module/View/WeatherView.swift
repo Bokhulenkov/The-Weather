@@ -7,9 +7,15 @@
 
 import UIKit
 
+protocol WeatherViewProtocol: AnyObject {
+    func updateLocation()
+}
+
 final class WeatherView: UIView {
     
     //    MARK: - Properties
+    
+    weak var delegate: WeatherViewProtocol?
     
     private let currentView: UIView = {
         let view = UIView()
@@ -66,6 +72,21 @@ final class WeatherView: UIView {
     
     private var tableViewHeightConstraint: NSLayoutConstraint!
     
+    private let updateLocationButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowOffset = CGSize(width: 1, height: 1)
+        button.layer.shadowOpacity = 0.5
+        var config = UIButton.Configuration.filled()
+        config.cornerStyle = .capsule
+        config.baseBackgroundColor = .customBlue
+        config.baseForegroundColor = .customGrey
+        config.title = "Update Locations"
+        button.configuration = config
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     //    MARK: - init
     
     override init(frame: CGRect) {
@@ -74,6 +95,7 @@ final class WeatherView: UIView {
         super.init(frame: frame)
         setUI()
         configureCollectionView()
+        updateLocationButton.addTarget(self, action: #selector(updateLocationsTapped), for: .touchUpInside)
         setConstraints()
     }
     
@@ -102,6 +124,7 @@ final class WeatherView: UIView {
         tableView.dataSource = vc
         collectionView.delegate = vc
         collectionView.dataSource = vc
+        delegate = vc
     }
     
     private func setUI() {
@@ -116,7 +139,8 @@ final class WeatherView: UIView {
         ].forEach { currentView.addSubview($0) }
         [
             collectionView,
-            tableView
+            tableView,
+            updateLocationButton
         ].forEach { addSubview($0) }
         
         tableView.register(WeatherTableViewCell.self, forCellReuseIdentifier: WeatherTableViewCell.identifier)
@@ -127,7 +151,6 @@ final class WeatherView: UIView {
     private func updateTableViewHeight() {
         let headerHeight = tableView.delegate?.tableView?(tableView, heightForHeaderInSection: 0) ?? 0
         tableViewHeightConstraint.constant = tableView.contentSize.height - headerHeight
-        tableView.layoutIfNeeded()
     }
     
     private static func makeLayout() -> UICollectionViewCompositionalLayout {
@@ -167,8 +190,15 @@ final class WeatherView: UIView {
     
     private func configureCollectionView() {
         collectionView.layer.cornerRadius = 20
+        collectionView.isScrollEnabled = false
         collectionView.backgroundColor = .customBlue
         collectionView.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    //    MARK: - Actions
+    
+    @objc private func updateLocationsTapped(_ sender: UIButton) {
+        delegate?.updateLocation()
     }
 }
 
@@ -203,7 +233,11 @@ private extension WeatherView {
             
             tableView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             tableView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
-            tableView.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 20)
+            tableView.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 20),
+            
+            updateLocationButton.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 10),
+            updateLocationButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20)
+            
         ])
         
         tableViewHeightConstraint = tableView.heightAnchor.constraint(equalToConstant: 1)

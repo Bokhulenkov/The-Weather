@@ -35,4 +35,15 @@ extension Date {
         }
         return Int(hourStartDate.timeIntervalSince1970)
     }
+    
+    static var endOfNextDay: Int {
+        let calendar = Calendar.current
+        guard let startOfDayAfterTomorrow = calendar.date(byAdding: .day, value: 2, to: calendar.startOfDay(for: .now)) else {
+            fatalError("Error receive DayAfterTomorrow")
+        }
+        guard let nextDay = calendar.date(byAdding: .second, value: -1, to: startOfDayAfterTomorrow) else {
+            fatalError("Error receive nextDay")
+        }
+        return Int(nextDay.timeIntervalSince1970)
+    }
 }
