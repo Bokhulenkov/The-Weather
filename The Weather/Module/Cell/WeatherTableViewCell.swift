@@ -53,6 +53,13 @@ final class WeatherTableViewCell: UITableViewCell {
         return progressBar
     }()
     
+    private let separator: UIView = {
+        let view = UIView()
+        view.backgroundColor = .separator
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     private var isGradientRendered = false
     
     //    MARK: - init
@@ -96,7 +103,8 @@ final class WeatherTableViewCell: UITableViewCell {
             iconImageView,
             maxTemp,
             minTemp,
-            temperatureProgressBar
+            temperatureProgressBar,
+            separator
         ].forEach {contentView.addSubview($0)}
     }
     
@@ -130,7 +138,12 @@ private extension WeatherTableViewCell {
             temperatureProgressBar.heightAnchor.constraint(equalToConstant: 10),
             
             maxTemp.leadingAnchor.constraint(equalTo: temperatureProgressBar.trailingAnchor, constant: 15),
-            maxTemp.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+            maxTemp.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            
+            separator.topAnchor.constraint(equalTo: contentView.topAnchor),
+            separator.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
+            separator.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
+            separator.heightAnchor.constraint(equalToConstant: 0.5)
         ])
     }
 }

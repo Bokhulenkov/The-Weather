@@ -57,6 +57,7 @@ final class WeatherView: UIView {
         tableView.layer.shadowOffset = CGSize(width: 1, height: 1)
         tableView.layer.shadowOpacity = 0.5
         tableView.clipsToBounds = false
+        tableView.isScrollEnabled = false
         tableView.backgroundColor = .customBlue
         tableView.separatorStyle = .none
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -124,7 +125,8 @@ final class WeatherView: UIView {
     }
     
     private func updateTableViewHeight() {
-        tableViewHeightConstraint.constant = tableView.contentSize.height
+        let headerHeight = tableView.delegate?.tableView?(tableView, heightForHeaderInSection: 0) ?? 0
+        tableViewHeightConstraint.constant = tableView.contentSize.height - headerHeight
         tableView.layoutIfNeeded()
     }
     
