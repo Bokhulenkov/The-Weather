@@ -259,7 +259,3 @@ extension ViewController: WeatherViewProtocol {
         locationManager.requestLocation()
     }
 }
-
-/*
- текущая, почасовая (показывать оставшиеся часы из текущего дня и все часы следующего),
- */

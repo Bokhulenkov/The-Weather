@@ -114,7 +114,7 @@ final class WeatherView: UIView {
         tableView.reloadData()
         collectionView.reloadData()
         
-        DispatchQueue.main.async {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             self.updateTableViewHeight()
         }
     }
@@ -149,8 +149,7 @@ final class WeatherView: UIView {
     }
     
     private func updateTableViewHeight() {
-        let headerHeight = tableView.delegate?.tableView?(tableView, heightForHeaderInSection: 0) ?? 0
-        tableViewHeightConstraint.constant = tableView.contentSize.height - headerHeight
+        tableViewHeightConstraint.constant = tableView.contentSize.height
     }
     
     private static func makeLayout() -> UICollectionViewCompositionalLayout {
