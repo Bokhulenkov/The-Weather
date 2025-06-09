@@ -112,6 +112,7 @@ final class WeatherTableViewCell: UITableViewCell {
         super.prepareForReuse()
         iconImageView.image = nil
         temperatureProgressBar.progressImage = nil
+        isGradientRendered = false
     }
 }
 

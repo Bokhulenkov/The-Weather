@@ -87,6 +87,12 @@ final class WeatherView: UIView {
         return button
     }()
     
+    private let activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.color = .systemGray
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        return indicator
+    }()
     //    MARK: - init
     
     override init(frame: CGRect) {
@@ -114,7 +120,10 @@ final class WeatherView: UIView {
         tableView.reloadData()
         collectionView.reloadData()
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        activityIndicator.startAnimating()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.activityIndicator.stopAnimating()
             self.updateTableViewHeight()
         }
     }
@@ -140,7 +149,8 @@ final class WeatherView: UIView {
         [
             collectionView,
             tableView,
-            updateLocationButton
+            updateLocationButton,
+            activityIndicator
         ].forEach { addSubview($0) }
         
         tableView.register(WeatherTableViewCell.self, forCellReuseIdentifier: WeatherTableViewCell.identifier)
@@ -235,8 +245,10 @@ private extension WeatherView {
             tableView.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 20),
             
             updateLocationButton.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 10),
-            updateLocationButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20)
+            updateLocationButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             
+            activityIndicator.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: self.centerYAnchor)
         ])
         
         tableViewHeightConstraint = tableView.heightAnchor.constraint(equalToConstant: 1)
